@@ -1,16 +1,16 @@
+using Serilog;
+using WebApplication1.Helpers;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.ClearProviders();
-builder.Logging.AddSimpleConsole(options =>
-{
-    options.IncludeScopes = true;
-    options.SingleLine = false;
-    options.TimestampFormat = "yyyy-MM-dd HH:mm:ss.fff ";
-    options.UseUtcTimestamp = true;
-});
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console(new CustomJsonFormatter())
+    .CreateLogger();
 
-var logLevel = builder.Configuration.GetValue("Logging:LogLevel:Default", LogLevel.Information);
-builder.Logging.SetMinimumLevel(logLevel);
+builder.Host.UseSerilog();
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

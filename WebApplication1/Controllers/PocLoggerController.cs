@@ -8,7 +8,6 @@ namespace WebApplication1.Controllers
     public class PocLoggerController(ILogger<PocLoggerController> logger) : ControllerBase
     {
         private readonly ILogger<PocLoggerController> _logger = logger;
-        private readonly string _environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Unknown";
 
         [HttpGet("LogInformation")]
         public IActionResult LogInformation()
@@ -19,7 +18,7 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(message: LogHelpers.FormatMessage(_environment, "This is relevant info!" ,ex));
+                _logger.LogCustomInformation(HttpContext, "This is relevant info!", ex);
                 return StatusCode(500, "Internal Server Error");
             }
         }
@@ -33,7 +32,21 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(message: LogHelpers.FormatMessage(_environment, "This is relevant info!", ex));
+                _logger.LogCustomWarning(HttpContext, "This is relevant info!", ex);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        [HttpGet("LogError")]
+        public IActionResult LogError()
+        {
+            try
+            {
+                throw new Exception("This is a simulated exception!");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCustomError(HttpContext, "This is relevant info!", ex);
                 return StatusCode(500, "Internal Server Error");
             }
         }
@@ -47,7 +60,7 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogCritical(message: LogHelpers.FormatMessage(_environment, "This is relevant info!", ex));
+                _logger.LogCustomCritical(HttpContext, "This is relevant info!", ex);
                 return StatusCode(500, "Internal Server Error");
             }
         }
